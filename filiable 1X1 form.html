@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1-on-1 Meeting Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+  <!-- Include jsPDF from a CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- Added an id to the form for easier JavaScript access -->
+  <form id="meetingForm" action="#" method="post">
+    <h1>1-on-1 Meeting Form</h1>
+
+    <!-- Employee and Manager Details -->
+    <div class="section">
+      <label for="employeeName">Employee Name:</label>
+      <select id="employeeName" name="employeeName" required>
+        <option value="Aidan Murphy">Aidan Murphy</option>
+	<option value="Amy Eccles">Amy Eccles</option>
+	<option value="Arnoldo Ceja">Arnoldo Ceja</option>
+	<option value="Brenda Brasch">Brenda Brasch</option>
+	<option value="Dana Macaraig">Dana Macaraig</option>
+	<option value="Giovanna Sanfelice">Giovanna Sanfelice</option>
+	<option value="Heidi Raven">Heidi Raven</option>
+	<option value="Margaret DeFore">Margaret DeFore</option>
+	<option value="Morgan Wells">Morgan Wells</option>
+	<option value="Oscar Mayorga">Oscar Mayorga</option>
+	<option value="Rosa Galindo">Rosa Galindo</option>
+	<option value="Sean Cabrera">Sean Cabrera</option>
+      </select>
+
+      <label for="managerName">Manager Name:</label>
+      <select id="managerName" name="managerName" required>
+        <option value="Amanda Murphy" selected>Amanda Murphy</option>
+	<option value="Bruce Gray" selected>Bruce Gray</option>
+	<option value="Rachel Hammer" selected>Rachel Hammer</option>
+      </select>
+
+      <label for="meetingDate">Date:</label>
+      <input type="date" id="meetingDate" name="meetingDate" required>
+    </div>
+
+    <!-- Agenda -->
+    <div class="section">
+      <h2>1. Agenda</h2>
+      <ul>
+        <li>Outstanding Issues or Updates</li>
+        <li>Follow-Up on Individual Development Plan (IDP)</li>
+        <li>Employee Topics/Concerns</li>
+      </ul>
+    </div>
+
+    <!-- Outstanding Issues or Updates -->
+    <div class="section">
+      <h2>2. Outstanding Issues or Updates</h2>
+      <p>(Discuss any ongoing issues, challenges, or updates related to the employee's work.)</p>
+
+      <label for="blockers">What are the current blockers or challenges in your projects?</label>
+      <textarea id="blockers" name="blockers"></textarea>
+
+      <label for="unresolved">Are there any unresolved issues that need attention?</label>
+      <textarea id="unresolved" name="unresolved"></textarea>
+
+      <label for="taskUpdates">Updates on tasks or responsibilities:</label>
+      <textarea id="taskUpdates" name="taskUpdates"></textarea>
+    </div>
+
+    <!-- Individual Development Plan (IDP) Follow-Up -->
+    <div class="section">
+      <h2>3. Individual Development Plan (IDP) Follow-Up</h2>
+      <p>(Review the employee's goals, progress, and support needed for their growth.)</p>
+
+      <label for="developmentProgress">Progress on development goals:</label>
+      <textarea id="developmentProgress" name="developmentProgress"></textarea>
+
+      <label for="supportNeeded">What support or resources do you need to achieve your goals?</label>
+      <textarea id="supportNeeded" name="supportNeeded"></textarea>
+
+      <label for="newGoals">Any changes or new goals to add?</label>
+      <textarea id="newGoals" name="newGoals"></textarea>
+    </div>
+
+    <!-- Employee Topics -->
+    <div class="section">
+      <h2>4. Employee Topics</h2>
+      <p>(Provide space for the employee to raise any concerns, share feedback, or discuss topics of their choice.)</p>
+
+      <label for="topics">Do you have any topics you’d like to discuss?</label>
+      <textarea id="topics" name="topics"></textarea>
+
+      <label for="feedback">Is there any feedback you’d like to share with me or the team?</label>
+      <textarea id="feedback" name="feedback"></textarea>
+
+      <label for="supportSuggestions">How can I better support you?</label>
+      <textarea id="supportSuggestions" name="supportSuggestions"></textarea>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="section">
+      <h2>5. Next Steps</h2>
+      <p>(Summarize action items, deadlines, and next steps from the discussion.)</p>
+
+      <label for="actionItemsEmployee">Key action items for the employee:</label>
+      <textarea id="actionItemsEmployee" name="actionItemsEmployee"></textarea>
+
+      <label for="actionItemsManager">Key action items for the manager:</label>
+      <textarea id="actionItemsManager" name="actionItemsManager"></textarea>
+
+      <label for="nextMeeting">Next 1-on-1 meeting date:</label>
+      <input type="date" id="nextMeeting" name="nextMeeting">
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Function to calculate the date of the next Tuesday
+    function getNextTuesday() {
+      const today = new Date();
+      const currentDay = today.getDay(); // Sunday=0, Monday=1, etc.
+      
+      // Tuesday is represented by 2. If today is Tuesday, add 7 days.
+      let daysToAdd = (2 - currentDay + 7) % 7;
+      if (daysToAdd === 0) {
+        daysToAdd = 7;
+      }
+      
+      const nextTuesday = new Date(today);
+      nextTuesday.setDate(today.getDate() + daysToAdd);
+      
+      // Format as YYYY-MM-DD
+      const year = nextTuesday.getFullYear();
+      const month = ('0' + (nextTuesday.getMonth() + 1)).slice(-2);
+      const day = ('0' + nextTuesday.getDate()).slice(-2);
+      return `${year}-${month}-${day}`;
+    }
+
+    // Once the DOM is loaded, auto-fill the "Next 1-on-1 meeting date"
+    document.addEventListener("DOMContentLoaded", function() {
+      const nextMeetingInput = document.getElementById("nextMeeting");
+      nextMeetingInput.value = getNextTuesday();
+      
+      // Handle the form submission for PDF generation
+      const form = document.getElementById("meetingForm");
+      form.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        
+        // Create a FormData object to easily access all form values
+        const formData = new FormData(form);
+        const data = {
+          employeeName: formData.get("employeeName"),
+          managerName: formData.get("managerName"),
+          meetingDate: formData.get("meetingDate"),
+          blockers: formData.get("blockers"),
+          unresolved: formData.get("unresolved"),
+          taskUpdates: formData.get("taskUpdates"),
+          developmentProgress: formData.get("developmentProgress"),
+          supportNeeded: formData.get("supportNeeded"),
+          newGoals: formData.get("newGoals"),
+          topics: formData.get("topics"),
+          feedback: formData.get("feedback"),
+          supportSuggestions: formData.get("supportSuggestions"),
+          actionItemsEmployee: formData.get("actionItemsEmployee"),
+          actionItemsManager: formData.get("actionItemsManager"),
+          nextMeeting: formData.get("nextMeeting")
+        };
+
+        // Create a new jsPDF instance
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let yPosition = 10; // Starting vertical position
+        
+        // Add a title
+        doc.setFontSize(16);
+        doc.text("1-on-1 Meeting Form Data", 10, yPosition);
+        yPosition += 10;
+        
+        // Set a standard font size for the content
+        doc.setFontSize(12);
+        doc.text(`Employee Name: ${data.employeeName}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Manager Name: ${data.managerName}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Meeting Date: ${data.meetingDate}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Blockers: ${data.blockers}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Unresolved Issues: ${data.unresolved}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Task Updates: ${data.taskUpdates}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Development Progress: ${data.developmentProgress}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Support Needed: ${data.supportNeeded}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`New Goals: ${data.newGoals}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Topics: ${data.topics}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Feedback: ${data.feedback}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Support Suggestions: ${data.supportSuggestions}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Employee Action Items: ${data.actionItemsEmployee}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Manager Action Items: ${data.actionItemsManager}`, 10, yPosition);
+        yPosition += 10;
+        doc.text(`Next Meeting: ${data.nextMeeting}`, 10, yPosition);
+        yPosition += 10;
+        
+        // Download the generated PDF
+        doc.save("meeting_form.pdf");
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1-on-1 Meeting Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+  <!-- Include EmailJS library -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+</head>
+<body>
+  <form id="meetingForm" action="#" method="post">
+    <h1>1-on-1 Meeting Form</h1>
+
+    <!-- Employee and Manager Details -->
+    <div class="section">
+      <label for="employeeName">Employee Name:</label>
+      <select id="employeeName" name="employeeName" required>
+        <option value="">Choose an item</option>
+        <option value="Margaret DeFore">Margaret DeFore</option>
+        <option value="Sean Cabrera">Sean Cabrera</option>
+        <option value="Aidan Murphy">Aidan Murphy</option>
+        <option value="Amy Eccles">Amy Eccles</option>
+        <option value="Arnoldo Ceja">Arnoldo Ceja</option>
+        <option value="Brenda Brasch">Brenda Brasch</option>
+        <option value="Dana Macaraig">Dana Macaraig</option>
+        <option value="Heidi Raven">Heidi Raven</option>
+        <option value="Giovanna Sanfelice">Giovanna Sanfelice</option>
+        <option value="Morgan Wells">Morgan Wells</option>
+        <option value="Oscar Mayorga">Oscar Mayorga</option>
+        <option value="Rosa Galindo">Rosa Galindo</option>
+      </select>
+
+      <label for="managerName">Manager Name:</label>
+      <select id="managerName" name="managerName" required>
+        <option value="Amanda Murphy" selected>Amanda Murphy</option>
+        <!-- You can add more manager options here if needed -->
+      </select>
+
+      <label for="meetingDate">Date:</label>
+      <input type="date" id="meetingDate" name="meetingDate" required>
+    </div>
+
+    <!-- Additional form sections would go here -->
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Initialize EmailJS with your public key (user ID)
+    (function(){
+      emailjs.init("pdpVGuWSgPZuaLKuS");
+    })();
+
+    // Mapping of manager names to their email addresses
+    const managerEmails = {
+      "Amanda Murphy": "AMurphy@restaurant3625.com"
+      // Add additional mappings for other managers if needed
+    };
+
+    // Function to calculate the next Tuesday (if needed)
+    function getNextTuesday() {
+      const today = new Date();
+      const currentDay = today.getDay();
+      let daysToAdd = (2 - currentDay + 7) % 7;
+      if (daysToAdd === 0) {
+        daysToAdd = 7;
+      }
+      const nextTuesday = new Date(today);
+      nextTuesday.setDate(today.getDate() + daysToAdd);
+      const year = nextTuesday.getFullYear();
+      const month = ('0' + (nextTuesday.getMonth() + 1)).slice(-2);
+      const day = ('0' + nextTuesday.getDate()).slice(-2);
+      return `${year}-${month}-${day}`;
+    }
+
+    // Optionally, auto-fill the "Next 1-on-1 meeting date" field (if present)
+    document.addEventListener("DOMContentLoaded", function() {
+      const nextMeetingInput = document.getElementById("nextMeeting");
+      if (nextMeetingInput) {
+        nextMeetingInput.value = getNextTuesday();
+      }
+    });
+
+    // Handle form submission to send an email using EmailJS
+    document.getElementById("meetingForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      // Collect form data
+      const formData = new FormData(event.target);
+      const data = {
+        employeeName: formData.get("employeeName"),
+        managerName: formData.get("managerName"),
+        meetingDate: formData.get("meetingDate")
+        // Add additional form fields as needed
+      };
+
+      // Get the manager's email from the mapping
+      const managerEmail = managerEmails[data.managerName] || "default@example.com";
+
+      // Prepare template parameters for EmailJS
+      const templateParams = {
+        to_email: managerEmail,
+        employee_name: data.employeeName,
+        meeting_date: data.meetingDate
+        // Include additional parameters as needed in your email template
+      };
+
+      // Send the email using EmailJS (replace YOUR_SERVICE_ID and YOUR_TEMPLATE_ID)
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+          console.log('SUCCESS!', response.status, response.text);
+          alert("Email sent successfully!");
+        }, function(error) {
+          console.log('FAILED...', error);
+          alert("Failed to send email. Please try again.");
+        });
+    });
+  </script>
+</body>
+</html>
